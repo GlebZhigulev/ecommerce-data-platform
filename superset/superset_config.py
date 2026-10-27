@@ -1,0 +1,5 @@
+import os
+
+SQLALCHEMY_DATABASE_URI = os.environ["SUPERSET_METADATA_DB_URI"]
+
+SECRET_KEY = os.environ["SUPERSET_SECRET_KEY"]
