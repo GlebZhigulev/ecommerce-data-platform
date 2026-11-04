@@ -34,6 +34,10 @@ def load_table(s3, conn, bucket, key, table):
         "COPY {} FROM STDIN WITH (FORMAT CSV, HEADER TRUE)"
     ).format(table_id)
 
+    count_query = sql.SQL(
+        "SELECT COUNT(*) FROM {}"
+    ).format(table_id)
+
     response = s3.get_object(
         Bucket=bucket,
         Key=key
@@ -42,17 +46,16 @@ def load_table(s3, conn, bucket, key, table):
     with closing(response["Body"]) as csv_file:
         with conn:
             with conn.cursor() as cursor:
+
                 cursor.execute(truncate_query)
+
                 cursor.copy_expert(
                     sql=copy_query.as_string(conn),
                     file=csv_file
                 )
 
-                count_query = sql.SQL(
-                    "SELECT COUNT(*) FROM {}"
-                ).format(table_id)
-
                 cursor.execute(count_query)
+                
                 rows_count = cursor.fetchone()[0]
 
     print(f"[SUCCESS] {table}: {rows_count} rows")

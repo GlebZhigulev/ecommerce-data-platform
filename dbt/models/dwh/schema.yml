@@ -1,0 +1,163 @@
+version: 2
+
+models:
+  - name: dim_sellers
+    description: "Измерение продавцов Olist"
+
+    columns:
+      - name: seller_id
+        description: "Уникальный идентификатор продавца"
+        data_tests:
+          - unique
+          - not_null
+
+  - name: dim_customers
+    description: "Измерение покупателей Olist"
+
+    columns:
+      - name: customer_id
+        description: "Уникальный идентификатор покупателя заказа"
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_unique_id
+        description: "Уникальный идентификатор покупателя"
+        data_tests:
+          - not_null
+
+  - name: dim_products
+    description: "Измерение товаров Olist"
+
+    columns:
+      - name: product_id
+        description: "Уникальный идентификатор товара"
+        data_tests:
+          - unique
+          - not_null
+
+  - name: fact_orders
+    description: "Заказы и показатели доставки"
+
+    columns:
+      - name: order_id
+        description: "Уникальный идентификатор заказа"
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id
+
+  - name: fact_order_items
+    description: "Товарные позиции заказов и их стоимость"
+
+    columns:
+      - name: order_id
+        description: "Уникальный идентификатор заказа"
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fact_orders')
+                field: order_id
+
+
+      - name: order_item_id
+        description: "Уникальный идентификатор товара в заказе"
+        data_tests:
+          - not_null
+
+      - name: customer_id
+        description: "Уникальный идентификатор покупателя"
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id
+
+
+      - name: product_id
+        description: "Уникальный идентификатор товара"
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_products')
+                field: product_id
+
+
+      - name: seller_id
+        description: "Уникальный идентификатор продавца"
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_sellers')
+                field: seller_id
+
+
+  - name: fact_payments
+    description: "Платёжные записи заказов"
+
+    columns:
+      - name: order_id
+        description: "Уникальный идентификатор заказа"
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fact_orders')
+                field: order_id
+
+
+      - name: payment_sequential
+        description: "Уникальный идентификатор платежа в заказа"
+        data_tests:
+          - not_null
+
+      - name: customer_id
+        description: "Уникальный идентификатор покупателя"
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id
+
+  - name: fact_reviews
+    description: "Отзывы и оценки покупателей"
+
+    columns:
+      - name: order_id
+        description: "Уникальный идентификатор заказа"
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fact_orders')
+                field: order_id
+
+
+      - name: review_id
+        description: "Уникальный идентификатор отзыва"
+        data_tests:
+          - not_null
+
+      - name: customer_id
+        description: "Уникальный идентификатор покупателя"
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id
+
+      - name: review_score
+        description: "Оценка"
+        data_tests:
+          - not_null      

@@ -1,0 +1,11 @@
+name: ecommerce_dwh
+version: "1.0.0"
+config-version: 2
+
+profile: ecommerce
+
+model-paths: ["models"]
+
+models:
+  ecommerce_dwh:
+    +materialized: table
