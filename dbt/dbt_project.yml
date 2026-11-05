@@ -9,3 +9,6 @@ model-paths: ["models"]
 models:
   ecommerce_dwh:
     +materialized: table
+
+    marts:
+      +schema: marts

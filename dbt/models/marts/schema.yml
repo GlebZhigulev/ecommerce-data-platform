@@ -1,0 +1,43 @@
+version: 2
+
+models:
+  - name: mart_daily_sales
+    description: "Аналитическая витрина ежедневных продаж"
+
+    columns:
+      - name: order_date
+        description: "Дата оформления заказа"
+        data_tests:
+          - unique
+          - not_null
+
+
+  - name: mart_product_sales
+    description: "Аналитическая витрина продаж товаров"
+
+    columns:
+      - name: product_id
+        description: "Уникальный идентификатор товара"
+        data_tests:
+          - unique
+          - not_null
+
+  - name: mart_seller_performance
+    description: "Аналитическая витрина продавцов"
+
+    columns:
+      - name: seller_id
+        description: "Уникальный идентификатор продавца"
+        data_tests:
+          - unique
+          - not_null
+
+  - name: mart_delivery_performance
+    description: "Аналитическая витрина эффективности доставки"
+
+    columns:
+      - name: order_date
+        description: "Дата оформления заказа"
+        data_tests:
+          - unique
+          - not_null

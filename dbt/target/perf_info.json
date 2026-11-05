@@ -1,0 +1,56 @@
+{
+    "path_count": 145,
+    "parsed_path_count": 145,
+    "static_analysis_path_count": 7,
+    "static_analysis_parsed_path_count": 7,
+    "is_partial_parse_enabled": true,
+    "is_static_analysis_enabled": true,
+    "read_files_elapsed": 0.12029060100000066,
+    "load_macros_elapsed": 0.3397717799999995,
+    "parse_project_elapsed": 0.42161230699999663,
+    "patch_sources_elapsed": 5.225000002440083e-06,
+    "process_manifest_elapsed": 0.0159911149999985,
+    "load_all_elapsed": 1.0236184180000052,
+    "projects": [
+        {
+            "project_name": "ecommerce_dwh",
+            "elapsed": 0.4202170570000021,
+            "parsers": [
+                {
+                    "parser": "model",
+                    "elapsed": 0.13593612199999683,
+                    "parsed_path_count": 7
+                },
+                {
+                    "parser": "test",
+                    "elapsed": 0.06603502899999825,
+                    "parsed_path_count": 3
+                },
+                {
+                    "parser": "test",
+                    "elapsed": 0.21596731800000413,
+                    "parsed_path_count": 1
+                }
+            ],
+            "parsed_path_count": 11
+        },
+        {
+            "project_name": "dbt_postgres",
+            "elapsed": 0.0006112239999964686,
+            "parsers": [],
+            "parsed_path_count": 0
+        },
+        {
+            "project_name": "dbt",
+            "elapsed": 0.0007103800000010096,
+            "parsers": [
+                {
+                    "parser": "doc",
+                    "elapsed": 0.00011735100000009879,
+                    "parsed_path_count": 1
+                }
+            ],
+            "parsed_path_count": 1
+        }
+    ]
+}
