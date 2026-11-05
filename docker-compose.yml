@@ -80,7 +80,9 @@ services:
   # Airflow — веб-интерфейс
   # ==========================================
   airflow-webserver:
-    image: apache/airflow:2.10.3
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
     depends_on:
       airflow-init:
         condition: service_completed_successfully
@@ -90,11 +92,33 @@ services:
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
       AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_WEBSERVER_SECRET_KEY}
+
+      # MinIO
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+      S3_ENDPOINT_URL: http://minio:9000
+
+      # PostgreSQL
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: ecommerce
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+      # dbt
+      DBT_PROFILES_DIR: /opt/airflow/dbt
+      DBT_ENGINE_LOG_PATH: /tmp/airflow-dbt-logs
+      DBT_ENGINE_TARGET_PATH: /tmp/airflow-dbt-target
+
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
       - ./scripts:/opt/airflow/scripts
+      - ./dbt:/opt/airflow/dbt
+      - ./data:/home/jovyan/work/data
+      - ./sql:/opt/airflow/sql:ro
+
     ports:
       - "8080:8080"
     command: webserver
@@ -104,21 +128,47 @@ services:
   # Airflow — планировщик и выполнение DAG
   # ==========================================
   airflow-scheduler:
-    image: apache/airflow:2.10.3
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
     depends_on:
       airflow-init:
         condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:${AIRFLOW_DB_PASSWORD}@airflow_db:5432/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
       AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_WEBSERVER_SECRET_KEY}
+
+      # MinIO
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+      S3_ENDPOINT_URL: http://minio:9000
+
+      # PostgreSQL
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: ecommerce
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+      # dbt
+      DBT_PROFILES_DIR: /opt/airflow/dbt
+      DBT_ENGINE_LOG_PATH: /tmp/airflow-dbt-logs
+      DBT_ENGINE_TARGET_PATH: /tmp/airflow-dbt-target
+
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
       - ./scripts:/opt/airflow/scripts
+      - ./dbt:/opt/airflow/dbt
+      - ./data:/home/jovyan/work/data
+      - ./sql:/opt/airflow/sql:ro
+
     command: scheduler
     restart: unless-stopped
 
@@ -199,7 +249,6 @@ services:
               --password "$$SUPERSET_ADMIN_PASSWORD"
           fi
           superset init
-    # Password is passed via environment below.
     restart: "no"
 
   # ==========================================
@@ -227,7 +276,9 @@ services:
           superset run -h 0.0.0.0 -p 8088 --with-threads
     restart: unless-stopped
 
-
+  # ==========================================
+  # dbt — SQL-преобразования DWH / MARTS
+  # ==========================================
   dbt:
     build:
       context: .
@@ -253,7 +304,6 @@ services:
 
     profiles:
       - tools
-
 
 volumes:
   pgdata:

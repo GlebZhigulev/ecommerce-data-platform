@@ -1,0 +1,26 @@
+FROM apache/airflow:2.10.3
+
+USER root
+
+# Git необходим для dbt.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Устанавливаем dbt в отдельное Python-окружение.
+RUN python -m venv /opt/dbt-venv \
+    && /opt/dbt-venv/bin/pip install --no-cache-dir \
+        "dbt-core==1.12.6" \
+        "dbt-postgres==1.11.0" \
+    && ln -sf /opt/dbt-venv/bin/dbt /usr/local/bin/dbt
+
+# Python-библиотеки для наших ETL-скриптов.
+USER airflow
+
+RUN pip install --no-cache-dir \
+    "apache-airflow==2.10.3" \
+    boto3 \
+    kagglehub \
+    psycopg2-binary
+
+WORKDIR /opt/airflow
